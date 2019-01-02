@@ -1,4 +1,4 @@
-" vim-bootstrap b990cad
+" vim-bootstrap b0a75e4
 
 "*****************************************************************************
 "" Vim-PLug core
@@ -9,7 +9,7 @@ endif
 
 let vimplug_exists=expand('~/.vim/autoload/plug.vim')
 
-let g:vim_bootstrap_langs = "go,ruby"
+let g:vim_bootstrap_langs = "go,ruby,php"
 let g:vim_bootstrap_editor = "vim"				" nvim or vim
 
 if !filereadable(vimplug_exists)
@@ -80,6 +80,10 @@ Plug 'tomasr/molokai'
 "*****************************************************************************
 "" Custom bundles
 "*****************************************************************************
+
+" php
+"" PHP Bundle
+Plug 'arnaud-lb/vim-php-namespace'
 
 " go
 "" Go Lang Bundle
@@ -457,6 +461,8 @@ nnoremap <Leader>o :.Gbrowse<CR>
 "*****************************************************************************
 "" Custom configs
 "*****************************************************************************
+
+" php
 
 " go
 " vim-go
