@@ -1,16 +1,15 @@
-wickett's vimrc
+Obie's vimrc
 -----
 
-This initially started out as a fork of adam-vim, but after finding vim-boostrap, thats now what I use. The vimrc file in the root of the repo is just vim-boostrap with one minor fix for my mac. The custom stuff has now been moved over to `.vimrc.local.bundles` and `.vimrc.local`.   
+This is a fork of adam-vim/wickett-vim. Custom configs have been moved over to `.vimrc.local.bundles` and `.vimrc.local`.   
 
-## My setup
-I am using a mac with iTerm2, vim (from homebrew) and tmux (also from homebrew).  I am not using macvim.
+Use with iTerm2, vim (from homebrew) and tmux (also from homebrew).
 
 Pre-reqs
 
 ```
 $ brew install ctags git
-$ git clone git@github.com:wickett/wickett-vim.git ~/.vim
+$ git clone git@github.com:obiemalik/vim.git ~/.vim
 ```
 
 To Install
