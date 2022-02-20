@@ -47,15 +47,27 @@ Plug 'Yggdroot/indentLine'
 Plug 'avelino/vim-bootstrap-updater'
 Plug 'sheerun/vim-polyglot'
 
+" Autopair
+"Plug 'jiangmiao/auto-pairs'
+
+" FZF
 if isdirectory('/usr/local/opt/fzf')
   Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
 else
   Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
   Plug 'junegunn/fzf.vim'
 endif
+
+" Search
+Plug 'mileszs/ack.vim'
+let g:ackprg = 'ag --vimgrep'
+
+" Vim Rooter
+Plug 'airblade/vim-rooter'
+
 let g:make = 'gmake'
 if exists('make')
-        let g:make = 'make'
+    let g:make = 'make'
 endif
 Plug 'Shougo/vimproc.vim', {'do': g:make}
 
@@ -76,10 +88,19 @@ Plug 'honza/vim-snippets'
 
 "" Color
 Plug 'tomasr/molokai'
+Plug 'sonph/onehalf', { 'rtp': 'vim' }
+Plug 'tpope/vim-vividchalk'
+Plug 'larsbs/vimterial_dark'
+Plug 'jaredgorski/SpaceCamp'
+Plug 'kyoz/purify', { 'rtp': 'vim' }
 
-"" COC
+" COC
 Plug 'neoclide/coc.nvim', { 'branch': 'release' }
-let g:coc_global_extensions = [ 'coc-tsserver' ]
+let g:coc_global_extensions = [ 'coc-tsserver', 'coc-json', 'coc-yaml' ]
+
+" Git
+Plug 'zivyangll/git-blame.vim'
+
 
 "*****************************************************************************
 "" Custom bundles
@@ -99,7 +120,6 @@ Plug 'tpope/vim-rails'
 Plug 'tpope/vim-rake'
 Plug 'tpope/vim-projectionist'
 Plug 'thoughtbot/vim-rspec'
-Plug 'ecomba/vim-ruby-refactoring'
 
 "" JS/TS/JSX/TSX
 Plug 'pangloss/vim-javascript'
@@ -115,9 +135,14 @@ if isdirectory('./node_modules') && isdirectory('./node_modules/eslint')
     let g:coc_global_extensions += [ 'coc-eslint' ]
 end
 
+autocmd FileType javascript set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2
+autocmd FileType typescript set tabstop=2|set shiftwidth=2|set expandtab softtabstop=2
+
 "" Graphql
 Plug 'jparise/vim-graphql'
 
+"" Tailwind
+Plug 'iamcco/coc-tailwindcss'
 
 "*****************************************************************************
 "*****************************************************************************
@@ -183,6 +208,20 @@ let g:session_autoload = "no"
 let g:session_autosave = "no"
 let g:session_command_aliases = 1
 
+" Tooltip Diagnostics or Documentation
+function! ShowDocIfNoDiagnostic(timer_id)
+  if (coc#float#has_float() == 0 && CocHasProvider('hover') == 1)
+    silent call CocActionAsync('doHover')
+  endif
+endfunction
+
+function! s:show_hover_doc()
+  call timer_start(500, 'ShowDocIfNoDiagnostic')
+endfunction
+
+autocmd CursorHoldI * :call <SID>show_hover_doc()
+autocmd CursorHold * :call <SID>show_hover_doc()
+
 "*****************************************************************************
 "" Visual Settings
 "*****************************************************************************
@@ -191,14 +230,18 @@ set ruler
 set number
 
 let no_buffers_menu=1
+
 if !exists('g:not_finish_vimplug')
-  colorscheme molokai
+    colorscheme purify
 endif
 
+set notermguicolors t_Co=256
 set mousemodel=popup
 set t_Co=256
 set guioptions=egmrti
 set gfn=Monospace\ 10
+set background=dark
+set conceallevel=0
 
 if has("gui_running")
   if has("gui_mac") || has("gui_macvim")
@@ -214,7 +257,8 @@ else
   let g:indentLine_char = '┆'
   let g:indentLine_faster = 1
 
-  
+  autocmd FileType json,markdown IndentLinesDisable
+
   if $COLORTERM == 'gnome-terminal'
     set term=gnome-256color
   else
@@ -222,14 +266,17 @@ else
       set term=xterm-256color
     endif
   endif
-  
 endif
-
 
 if &term =~ '256color'
   set t_ut=
 endif
 
+if exists('+termguicolors')
+  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+  set termguicolors
+endif
 
 "" Disable the blinking cursor.
 set gcr=a:blinkon0
@@ -280,20 +327,20 @@ cnoreabbrev W w
 cnoreabbrev Q q
 cnoreabbrev Qall qall
 
-"" Tree configuration
-let g:TreeChDirMode=2
-let g:TreeIgnore=['\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__']
-let g:TreeSortOrder=['^__\.py$', '\/$', '*', '\.swp$', '\.bak$', '\~$']
-let g:TreeShowBookmarks=1
+"" NERDTree configuration
+let g:NERDTreeChDirMode=2
+let g:NERDTreeIgnore=['\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__']
+let g:NERDTreeSortOrder=['^__\.py$', '\/$', '*', '\.swp$', '\.bak$', '\~$']
+let g:NERDTreeShowBookmarks=1
 let g:nerdtree_tabs_focus_on_files=1
-let g:TreeMapOpenInTabSilent = '<RightMouse>'
-let g:TreeWinSize = 50
-
-let NERDTreeShowHidden=1
-
+let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
+let g:NERDTreeWinSize = 50
+let g:NERDTreeShowHidden=1
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite
-nnoremap <silent> <F2> :TreeFind<CR>
-nnoremap <silent> <F3> :TreeToggle<CR>
+nnoremap <silent> <F2> :NERDTreeFind<CR>
+nnoremap <silent> <F3> :NERDTreeToggle<CR>
+
+:command NT NERDTree
 
 " grep.vim
 nnoremap <silent> <leader>f :Rgrep<CR>
@@ -395,9 +442,12 @@ noremap <Leader>e :e <C-R>=expand("%:p:h") . "/" <CR>
 noremap <Leader>te :tabe <C-R>=expand("%:p:h") . "/" <CR>
 
 "" fzf.vim
+set wildmenu
 set wildmode=list:longest,list:full
 set wildignore+=*.o,*.obj,.git,*.rbc,*.pyc,__pycache__
-let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
+:command F FZF
+let $FZF_DEFAULT_COMMAND = "fd -H -E .git"
+"" let $FZF_DEFAULT_COMMAND =  "find * -path '*/.*' -o -path '.git/**' -prune -o -path '.yarn/**' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
 
 " The Silver Searcher
 if executable('ag')
@@ -445,6 +495,14 @@ endif
 if has('unnamedplus')
   set clipboard=unnamed,unnamedplus
 endif
+
+" delete without yanking
+nnoremap <leader>d "_d
+vnoremap <leader>d "_d
+
+" replace currently selected text with default register
+" without yanking it
+vnoremap <leader>p "_dP
 
 noremap YY "+y<CR>
 noremap <leader>p "+gP<CR>
@@ -556,6 +614,7 @@ augroup go
 
 augroup END
 
+autocmd BufReadPost quickfix nnoremap <buffer> <CR> <CR>
 
 " ruby
 let g:rubycomplete_buffer_loading = 1
@@ -651,3 +710,27 @@ else
   let g:airline_symbols.readonly = ''
   let g:airline_symbols.linenr = ''
 endif
+
+" gitgutter
+set signcolumn=yes
+
+nmap ]h <Plug>(GitGutterNextHunk) "same as default
+nmap [h <Plug>(GitGutterPrevHunk) "same as default
+
+nmap ghs <Plug>(GitGutterStageHunk)
+nmap ghu <Plug>(GitGutterUndoHunk)
+
+let g:gitgutter_sign_added = '✚'
+let g:gitgutter_sign_modified = '✹'
+let g:gitgutter_sign_removed = '-'
+let g:gitgutter_sign_removed_first_line = '-'
+let g:gitgutter_sign_modified_removed = '-'
+
+" CoC
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gr <Plug>(coc-references)
+nmap <silent> rn <Plug>(coc-rename)
+
+" Commands
+:command C close
+:command B Buf
